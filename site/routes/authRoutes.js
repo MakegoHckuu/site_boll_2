@@ -9,6 +9,9 @@ router.post('/login', async (req, res) => {
     try {
         // Извлечение email и password из тела запроса
         const { email, password } = req.body;
+        if (!email || !password) {
+            return res.status(400).json({ message: 'Email and password are required.' });
+        }
 
         // Поиск пользователя по email
         const user = await User.findOne({ email });
@@ -26,7 +29,7 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET, // Ключ для подписи токена, хранится в переменных окружения
-            { expiresIn: '1h' } // Срок действия токена
+            { expiresIn: '1h' } // Срок действия токена и использование более безопасного алгоритма подписи
         );
 
         // Отправка ответа с токеном
@@ -36,3 +39,5 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Error logging in', error: error });
     }
 });
+// Экспорт роутера
+module.exports = router;
